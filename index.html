@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ニャードク</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{
+  background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:12px 8px 24px;gap:10px;
+  font-family:'Noto Sans JP',sans-serif;
+  color:#fff;
+  user-select:none;
+}
+h1{font-size:22px;letter-spacing:2px;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,.4);margin-top:4px;}
+.info-row{display:flex;align-items:center;gap:16px;}
+.level{font-size:13px;color:#aaa;}
+.lives{font-size:22px;}
+.progress{font-size:13px;color:#7fc;}
+
+#grid-wrap{
+  background:rgba(255,255,255,.05);
+  border-radius:16px;
+  padding:10px;
+  box-shadow:0 8px 40px rgba(0,0,0,.5);
+}
+
+.grid{
+  display:grid;
+  gap:3px;
+}
+
+.cell{
+  width:100%;aspect-ratio:1;
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0;
+  cursor:pointer;
+  transition:transform .1s, filter .1s;
+  position:relative;
+  border:2px solid rgba(0,0,0,.15);
+}
+.cell:active{transform:scale(.92);}
+.cell.marked-paw::after{
+  content:'🐾';
+  font-size:clamp(14px,4vw,22px);
+}
+.cell.marked-cat::after{
+  content:'🐱';
+  font-size:clamp(16px,4.5vw,26px);
+}
+.cell.wrong{
+  animation:shake .3s;
+  filter:brightness(1.4) saturate(2) hue-rotate(300deg);
+}
+.cell.correct-cat::after{
+  content:'🐱';
+  font-size:clamp(16px,4.5vw,26px);
+  animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes shake{0%{transform:translate(0,0)}25%{transform:translate(-4px,0)}75%{transform:translate(4px,0)}100%{transform:translate(0,0)}}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+
+.hint-box{
+  background:rgba(255,255,255,.08);
+  border-radius:10px;
+  padding:8px 14px;
+  font-size:11px;
+  color:#aaa;
+  text-align:center;
+  line-height:1.8;
+  max-width:340px;
+}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:50;backdrop-filter:blur(8px);}
+.overlay.show{display:flex;}
+.overlay h2{font-size:clamp(28px,8vw,44px);letter-spacing:3px;}
+.overlay p{color:#888;font-size:13px;}
+.btn{font-size:15px;letter-spacing:2px;padding:10px 28px;border-radius:10px;border:1px solid #ffd700;background:transparent;color:#ffd700;cursor:pointer;transition:background .15s,color .15s;touch-action:manipulation;}
+.btn:hover,.btn:active{background:#ffd700;color:#000;}
+
+.level-select{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+.lbtn{font-size:13px;padding:6px 16px;border-radius:8px;border:1px solid #555;background:transparent;color:#aaa;cursor:pointer;transition:all .15s;touch-action:manipulation;}
+.lbtn:hover,.lbtn:active{border-color:#ffd700;color:#ffd700;}
+.lbtn.active{background:#ffd700;color:#000;border-color:#ffd700;}
+</style>
+</head>
+<body>
+
+<h1>🐱 ニャードク</h1>
+<div class="info-row">
+  <div class="level" id="level-label">LEVEL 1</div>
+  <div class="lives" id="lives">🐟🐟🐟</div>
+  <div class="progress" id="progress">0 / 0</div>
+</div>
+
+<div id="grid-wrap">
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="hint-box">
+  クリック：足跡マーク　ダブルクリック：猫マーク<br>
+  スマホ：タップ→足跡　長押し→猫マーク<br>
+  各色エリアに猫は1匹・同行同列に猫は1匹・猫同士は隣接しない
+</div>
+
+<div class="overlay" id="overlay-clear">
+  <h2 style="color:#ffd700;">🎉 クリア！</h2>
+  <p>全ての猫を発見しました</p>
+  <button class="btn" onclick="nextLevel()">次のレベル ▶</button>
+  <button class="btn" onclick="showLevelSelect()">レベル選択</button>
+</div>
+<div class="overlay" id="overlay-over">
+  <h2 style="color:#e05050;">💀 ゲームオーバー</h2>
+  <p>3回ミスしました</p>
+  <button class="btn" onclick="restartLevel()">もう一度</button>
+  <button class="btn" onclick="showLevelSelect()">レベル選択</button>
+</div>
+<div class="overlay" id="overlay-select">
+  <h2 style="color:#ffd700;">レベル選択</h2>
+  <div class="level-select" id="level-select"></div>
+  <button class="btn" style="margin-top:8px;" onclick="hideOverlay('overlay-select')">閉じる</button>
+</div>
+
+<script>
+// ============================================================
+// カラーパレット（エリア色）
+// ============================================================
+const COLORS=[
+  '#e87a7a','#7ab8e8','#7ae8a0','#e8c87a','#c87ae8',
+  '#7ae8e8','#e87ac8','#a0e87a','#e8a07a','#7a8ae8',
+];
+
+// ============================================================
+// レベル定義
+// グリッドサイズとエリア数で難易度を変える
+// regionsはcellの色インデックス配列（rows×cols）
+// ============================================================
+
+// レベルを生成する関数
+// N×Nグリッドにcolor数=Nのエリアを作成し、猫配置をソルバーで確認
+function generateLevel(N){
+  // エリアをランダムに生成（flood fill的に）
+  for(let attempt=0;attempt<100;attempt++){
+    const regions=makeRegions(N);
+    if(!regions)continue;
+    // 解を求める
+    const sol=solve(N,regions);
+    if(sol&&sol.length===N){
+      return{N,regions,solution:sol};
+    }
+  }
+  return null;
+}
+
+// N×NグリッドにNエリアをランダム生成
+function makeRegions(N){
+  const grid=Array.from({length:N},()=>Array(N).fill(-1));
+  // 各エリアのシード（開始セル）をランダムに配置
+  const seeds=[];
+  const used=new Set();
+  for(let i=0;i<N;i++){
+    let r,c,key;
+    let tries=0;
+    do{r=rnd(N);c=rnd(N);key=r*N+c;tries++;}
+    while(used.has(key)&&tries<100);
+    if(used.has(key))return null;
+    used.add(key);
+    grid[r][c]=i;
+    seeds.push([r,c]);
+  }
+
+  // BFS拡張
+  const queue=[...seeds.map(([r,c],i)=>({r,c,color:i}))];
+  shuffleArr(queue);
+  while(queue.length){
+    const idx=rnd(queue.length);
+    const {r,c,color}=queue[idx];
+    queue.splice(idx,1);
+    for(const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]){
+      const nr=r+dr,nc=c+dc;
+      if(nr<0||nr>=N||nc<0||nc>=N||grid[nr][nc]!==-1)continue;
+      grid[nr][nc]=color;
+      queue.push({r:nr,c:nc,color});
+    }
+  }
+
+  // 全セルが埋まっているか確認
+  if(grid.some(row=>row.some(v=>v===-1)))return null;
+  // 各エリアが連結かつ最低1セル以上
+  for(let i=0;i<N;i++){
+    const cells=[];
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(grid[r][c]===i)cells.push([r,c]);
+    if(cells.length===0)return null;
+  }
+  return grid;
+}
+
+// ============================================================
+// ソルバー（バックトラック）
+// 制約: 各エリアに1匹、各行1匹、各列1匹、隣接なし
+// ============================================================
+function solve(N,regions){
+  // エリアごとのセル一覧
+  const areaCells=Array.from({length:N},()=>[]);
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)areaCells[regions[r][c]].push([r,c]);
+
+  const usedRows=new Set(),usedCols=new Set();
+  const placed=[];
+
+  function bt(areaIdx){
+    if(areaIdx===N)return true;
+    for(const [r,c] of areaCells[areaIdx]){
+      if(usedRows.has(r)||usedCols.has(c))continue;
+      // 隣接チェック
+      let adj=false;
+      for(const [pr,pc] of placed){
+        if(Math.abs(pr-r)<=1&&Math.abs(pc-c)<=1){adj=true;break;}
+      }
+      if(adj)continue;
+      usedRows.add(r);usedCols.add(c);placed.push([r,c]);
+      if(bt(areaIdx+1))return true;
+      usedRows.delete(r);usedCols.delete(c);placed.pop();
+    }
+    return false;
+  }
+
+  return bt(0)?[...placed]:null;
+}
+
+// ============================================================
+// ゲーム状態
+// ============================================================
+let currentLevel=0;
+let N,regions,solution,cellStates,lives,gameOver;
+let pressTimer=null;
+
+const LEVELS=[4,5,6,7,8,9,10]; // グリッドサイズ
+
+function rnd(n){return Math.floor(Math.random()*n);}
+function shuffleArr(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}}
+
+function startLevel(lvIdx){
+  currentLevel=lvIdx;
+  lives=3;gameOver=false;
+  updateLives();
+  document.getElementById('level-label').textContent=`LEVEL ${lvIdx+1}`;
+  hideOverlay('overlay-clear');hideOverlay('overlay-over');hideOverlay('overlay-select');
+
+  const size=LEVELS[Math.min(lvIdx,LEVELS.length-1)];
+  let lv=null;
+  for(let i=0;i<50;i++){lv=generateLevel(size);if(lv)break;}
+  if(!lv){alert('生成失敗、再試行してください');return;}
+
+  N=lv.N;regions=lv.regions;solution=lv.solution;
+  cellStates=Array.from({length:N},()=>Array(N).fill(0)); // 0=空,1=足跡,2=猫
+
+  buildGrid();
+  updateProgress();
+}
+
+function restartLevel(){startLevel(currentLevel);}
+function nextLevel(){startLevel(Math.min(currentLevel+1,LEVELS.length-1));}
+
+function buildGrid(){
+  const wrap=document.getElementById('grid-wrap');
+  const maxSize=Math.min(window.innerWidth-32,440);
+  const cs=Math.floor(maxSize/N)-3;
+  wrap.style.width=(cs*N+3*(N-1)+20)+'px';
+
+  const grid=document.getElementById('grid');
+  grid.style.gridTemplateColumns=`repeat(${N},${cs}px)`;
+  grid.innerHTML='';
+
+  for(let r=0;r<N;r++){
+    for(let c=0;c<N;c++){
+      const cell=document.createElement('div');
+      cell.className='cell';
+      cell.style.width=cs+'px';
+      cell.style.background=COLORS[regions[r][c]%COLORS.length];
+
+      // クリック: 足跡 → 猫 → 空 のサイクル（PCではシングルクリックで足跡/ダブルクリックで猫）
+      let clickTimer=null;
+      cell.addEventListener('click',e=>{
+        if(gameOver)return;
+        if(clickTimer){
+          clearTimeout(clickTimer);clickTimer=null;
+          handleCat(r,c,cell);
+        } else {
+          clickTimer=setTimeout(()=>{clickTimer=null;handlePaw(r,c,cell);},220);
+        }
+      });
+
+      // 長押し（スマホ）
+      cell.addEventListener('touchstart',e=>{
+        e.preventDefault();
+        pressTimer=setTimeout(()=>{pressTimer=null;handleCat(r,c,cell);},500);
+      },{passive:false});
+      cell.addEventListener('touchend',e=>{
+        e.preventDefault();
+        if(pressTimer){clearTimeout(pressTimer);pressTimer=null;handlePaw(r,c,cell);}
+      },{passive:false});
+      cell.addEventListener('touchmove',e=>{
+        if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}
+      },{passive:false});
+
+      grid.appendChild(cell);
+    }
+  }
+}
+
+function getCell(r,c){
+  return document.getElementById('grid').children[r*N+c];
+}
+
+function handlePaw(r,c,cell){
+  if(gameOver)return;
+  const s=cellStates[r][c];
+  if(s===2)return; // 猫マーク済みは変更しない
+  cellStates[r][c]=s===1?0:1;
+  cell.className='cell'+(cellStates[r][c]===1?' marked-paw':'');
+  cell.style.background=COLORS[regions[r][c]%COLORS.length];
+}
+
+function handleCat(r,c,cell){
+  if(gameOver)return;
+  if(cellStates[r][c]===2){
+    // 猫を外す
+    cellStates[r][c]=0;
+    cell.className='cell';
+    cell.style.background=COLORS[regions[r][c]%COLORS.length];
+    updateProgress();
+    return;
+  }
+  // 猫を置く → 正誤判定
+  const isSol=solution.some(([sr,sc])=>sr===r&&sc===c);
+  if(isSol){
+    cellStates[r][c]=2;
+    cell.className='cell correct-cat';
+    cell.style.background=COLORS[regions[r][c]%COLORS.length];
+    updateProgress();
+    // クリアチェック
+    const found=solution.filter(([sr,sc])=>cellStates[sr][sc]===2).length;
+    if(found===N){
+      setTimeout(()=>document.getElementById('overlay-clear').classList.add('show'),400);
+    }
+  } else {
+    // ミス
+    lives--;
+    updateLives();
+    cell.classList.add('wrong');
+    setTimeout(()=>{cell.classList.remove('wrong');},400);
+    if(lives<=0){
+      gameOver=true;
+      // 正解を表示
+      solution.forEach(([sr,sc])=>{
+        const sc2=getCell(sr,sc);
+        cellStates[sr][sc]=2;
+        sc2.className='cell correct-cat';
+        sc2.style.background=COLORS[regions[sr][sc]%COLORS.length];
+      });
+      setTimeout(()=>document.getElementById('overlay-over').classList.add('show'),600);
+    }
+  }
+}
+
+function updateLives(){
+  const icons=[0,1,2].map(i=>i<(3-lives)?'💀':'🐟').join('');
+  document.getElementById('lives').textContent=icons;
+}
+
+function updateProgress(){
+  const found=solution.filter(([r,c])=>cellStates[r][c]===2).length;
+  document.getElementById('progress').textContent=`${found} / ${N}`;
+}
+
+function showLevelSelect(){
+  hideOverlay('overlay-clear');hideOverlay('overlay-over');
+  const sel=document.getElementById('level-select');
+  sel.innerHTML='';
+  LEVELS.forEach((size,i)=>{
+    const btn=document.createElement('button');
+    btn.className='lbtn'+(i===currentLevel?' active':'');
+    btn.textContent=`Lv${i+1} (${size}×${size})`;
+    btn.onclick=()=>startLevel(i);
+    sel.appendChild(btn);
+  });
+  document.getElementById('overlay-select').classList.add('show');
+}
+
+function hideOverlay(id){document.getElementById(id).classList.remove('show');}
+
+startLevel(0);
+</script>
+</body>
+</html>
