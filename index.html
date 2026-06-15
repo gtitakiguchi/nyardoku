@@ -13,79 +13,49 @@ body{
   display:flex;flex-direction:column;align-items:center;
   padding:12px 8px 24px;gap:10px;
   font-family:'Noto Sans JP',sans-serif;
-  color:#fff;
-  user-select:none;
-  touch-action:none;
+  color:#fff;user-select:none;touch-action:none;
 }
 h1{font-size:22px;letter-spacing:2px;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,.4);margin-top:4px;}
-.info-row{display:flex;align-items:center;gap:16px;}
-.level{font-size:13px;color:#aaa;}
-.lives{font-size:22px;}
+.info-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;}
+.level-label{font-size:13px;color:#aaa;}
+.lives{font-size:20px;letter-spacing:2px;}
 .progress{font-size:13px;color:#7fc;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
 
-#grid-wrap{
-  background:rgba(255,255,255,.05);
-  border-radius:16px;
-  padding:10px;
-  box-shadow:0 8px 40px rgba(0,0,0,.5);
-}
+#grid-wrap{background:rgba(255,255,255,.05);border-radius:16px;padding:10px;box-shadow:0 8px 40px rgba(0,0,0,.5);}
 
-.grid{
-  display:grid;
-  gap:3px;
-}
-
+.grid{display:grid;gap:3px;}
 .cell{
-  width:100%;aspect-ratio:1;
-  border-radius:6px;
+  width:100%;aspect-ratio:1;border-radius:6px;
   display:flex;align-items:center;justify-content:center;
-  font-size:0;
-  cursor:pointer;
-  transition:transform .1s, filter .1s;
+  cursor:pointer;transition:transform .1s,filter .1s;
+  border:2px solid rgba(0,0,0,.15);font-size:0;
   position:relative;
-  border:2px solid rgba(0,0,0,.15);
 }
 .cell:active{transform:scale(.92);}
-.cell.marked-paw::after{
-  content:'🐾';
-  font-size:clamp(14px,4vw,22px);
-}
-.cell.marked-cat::after{
-  content:'🐱';
-  font-size:clamp(16px,4.5vw,26px);
-}
-.cell.wrong{
-  animation:shake .3s;
-  filter:brightness(1.4) saturate(2) hue-rotate(300deg);
-}
-.cell.correct-cat::after{
-  content:'🐱';
-  font-size:clamp(16px,4.5vw,26px);
-  animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
-}
+.cell.marked-paw::after{content:'🐾';font-size:clamp(12px,3.5vw,20px);}
+.cell.marked-cat::after{content:'🐱';font-size:clamp(14px,4vw,24px);animation:popIn .3s cubic-bezier(.34,1.56,.64,1);}
+.cell.hint-cell::after{content:'❌';font-size:clamp(12px,3.5vw,20px);opacity:.7;}
+.cell.wrong{animation:shake .3s;}
 @keyframes shake{0%{transform:translate(0,0)}25%{transform:translate(-4px,0)}75%{transform:translate(4px,0)}100%{transform:translate(0,0)}}
 @keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
 
-.hint-box{
-  background:rgba(255,255,255,.08);
-  border-radius:10px;
-  padding:8px 14px;
-  font-size:11px;
-  color:#aaa;
-  text-align:center;
-  line-height:1.8;
-  max-width:340px;
-}
+.hint-box{background:rgba(255,255,255,.08);border-radius:10px;padding:8px 14px;font-size:11px;color:#aaa;text-align:center;line-height:1.8;max-width:340px;}
 
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:50;backdrop-filter:blur(8px);}
-.overlay.show{display:flex;}
-.overlay h2{font-size:clamp(28px,8vw,44px);letter-spacing:3px;}
-.overlay p{color:#888;font-size:13px;}
-.btn{font-size:15px;letter-spacing:2px;padding:10px 28px;border-radius:10px;border:1px solid #ffd700;background:transparent;color:#ffd700;cursor:pointer;transition:background .15s,color .15s;touch-action:manipulation;}
+.btn{font-size:13px;letter-spacing:1px;padding:8px 18px;border-radius:10px;border:1px solid #ffd700;background:transparent;color:#ffd700;cursor:pointer;transition:background .15s,color .15s;touch-action:manipulation;}
 .btn:hover,.btn:active{background:#ffd700;color:#000;}
+.btn.red{border-color:#e05050;color:#e05050;}
+.btn.red:hover,.btn.red:active{background:#e05050;color:#fff;}
+.btn.green{border-color:#7fc;color:#7fc;}
+.btn.green:hover,.btn.green:active{background:#7fc;color:#000;}
 
-.level-select{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
-.lbtn{font-size:13px;padding:6px 16px;border-radius:8px;border:1px solid #555;background:transparent;color:#aaa;cursor:pointer;transition:all .15s;touch-action:manipulation;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:50;backdrop-filter:blur(8px);}
+.overlay.show{display:flex;}
+.overlay h2{font-size:clamp(24px,7vw,40px);letter-spacing:3px;}
+.overlay p{color:#888;font-size:13px;text-align:center;padding:0 16px;}
+
+.level-select-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:320px;width:100%;}
+.lbtn{font-size:12px;padding:8px 4px;border-radius:8px;border:1px solid #555;background:transparent;color:#aaa;cursor:pointer;transition:all .15s;touch-action:manipulation;text-align:center;}
 .lbtn:hover,.lbtn:active{border-color:#ffd700;color:#ffd700;}
 .lbtn.active{background:#ffd700;color:#000;border-color:#ffd700;}
 </style>
@@ -94,183 +64,214 @@ h1{font-size:22px;letter-spacing:2px;color:#ffd700;text-shadow:0 0 20px rgba(255
 
 <h1>🐱 ニャードク</h1>
 <div class="info-row">
-  <div class="level" id="level-label">LEVEL 1</div>
+  <div class="level-label" id="level-label">LEVEL 1</div>
   <div class="lives" id="lives">🐟🐟🐟</div>
   <div class="progress" id="progress">0 / 0</div>
 </div>
+<div class="btn-row">
+  <button class="btn" onclick="showLevelSelect()">レベル選択</button>
+  <button class="btn green" onclick="useHint()">💡 ヒント</button>
+  <button class="btn red" onclick="giveUp()">🏳️ ギブアップ</button>
+</div>
 
-<div id="grid-wrap">
+<div id="grid-wrap" style="display:none;">
   <div class="grid" id="grid"></div>
 </div>
 
-<div class="hint-box">
+<div class="hint-box" id="hint-box">
   クリック：足跡マーク　ダブルクリック：猫マーク<br>
   スマホ：タップ→足跡　長押し→猫マーク<br>
   各色エリアに猫は1匹・同行同列に猫は1匹・猫同士は隣接しない
 </div>
 
+<!-- レベル選択（初期表示） -->
+<div class="overlay show" id="overlay-select">
+  <h2 style="color:#ffd700;">🐱 ニャードク</h2>
+  <p style="color:#aaa;">レベルを選んでください</p>
+  <div class="level-select-grid" id="level-select"></div>
+</div>
+
+<!-- クリア -->
 <div class="overlay" id="overlay-clear">
   <h2 style="color:#ffd700;">🎉 クリア！</h2>
-  <p>全ての猫を発見しました</p>
+  <p>全ての猫を発見しました！</p>
   <button class="btn" onclick="nextLevel()">次のレベル ▶</button>
-  <button class="btn" onclick="showLevelSelect()">レベル選択</button>
-</div>
-<div class="overlay" id="overlay-over">
-  <h2 style="color:#e05050;">💀 ゲームオーバー</h2>
-  <p>3回ミスしました</p>
   <button class="btn" onclick="restartLevel()">もう一度</button>
   <button class="btn" onclick="showLevelSelect()">レベル選択</button>
 </div>
-<div class="overlay" id="overlay-select">
-  <h2 style="color:#ffd700;">レベル選択</h2>
-  <div class="level-select" id="level-select"></div>
-  <button class="btn" style="margin-top:8px;" onclick="hideOverlay('overlay-select')">閉じる</button>
+
+<!-- ゲームオーバー -->
+<div class="overlay" id="overlay-over">
+  <h2 style="color:#e05050;">😿 ゲームオーバー</h2>
+  <p>3回ミスしました<br>正解はこちらでした</p>
+  <button class="btn" onclick="restartLevel()">もう一度</button>
+  <button class="btn" onclick="showLevelSelect()">レベル選択</button>
+</div>
+
+<!-- ギブアップ確認 -->
+<div class="overlay" id="overlay-giveup">
+  <h2 style="color:#aaa;">🏳️ ギブアップ？</h2>
+  <p>正解を表示してゲームを終了します</p>
+  <div style="display:flex;gap:12px;">
+    <button class="btn red" onclick="confirmGiveUp()">はい</button>
+    <button class="btn" onclick="hideOverlay('overlay-giveup')">いいえ</button>
+  </div>
 </div>
 
 <script>
-// ============================================================
-// カラーパレット（エリア色）
-// ============================================================
 const COLORS=[
   '#e87a7a','#7ab8e8','#7ae8a0','#e8c87a','#c87ae8',
   '#7ae8e8','#e87ac8','#a0e87a','#e8a07a','#7a8ae8',
+  '#e8e87a','#a0c8a0',
 ];
 
-// ============================================================
-// レベル定義
-// グリッドサイズとエリア数で難易度を変える
-// regionsはcellの色インデックス配列（rows×cols）
-// ============================================================
+const LEVELS=[4,5,6,7,8,9,10];
+let currentLevel=0;
+let N,regions,solution,allSolutions,cellStates,lives,gameOver;
+let hintUsed=0;
 
-// レベルを生成する関数
-// N×Nグリッドにcolor数=Nのエリアを作成し、猫配置をソルバーで確認
-function generateLevel(N){
-  // エリアをランダムに生成（flood fill的に）
-  for(let attempt=0;attempt<100;attempt++){
-    const regions=makeRegions(N);
-    if(!regions)continue;
-    // 解を求める
-    const sol=solve(N,regions);
-    if(sol&&sol.length===N){
-      return{N,regions,solution:sol};
-    }
-  }
-  return null;
-}
+function rnd(n){return Math.floor(Math.random()*n);}
+function shuffleArr(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}}
 
-// N×NグリッドにNエリアをランダム生成
+// ============================================================
+// エリア生成
+// ============================================================
 function makeRegions(N){
   const grid=Array.from({length:N},()=>Array(N).fill(-1));
-  // 各エリアのシード（開始セル）をランダムに配置
-  const seeds=[];
   const used=new Set();
+  const seeds=[];
   for(let i=0;i<N;i++){
-    let r,c,key;
-    let tries=0;
-    do{r=rnd(N);c=rnd(N);key=r*N+c;tries++;}
-    while(used.has(key)&&tries<100);
+    let r,c,key,tries=0;
+    do{r=rnd(N);c=rnd(N);key=r*N+c;tries++;}while(used.has(key)&&tries<200);
     if(used.has(key))return null;
-    used.add(key);
-    grid[r][c]=i;
-    seeds.push([r,c]);
+    used.add(key);grid[r][c]=i;seeds.push([r,c]);
   }
-
-  // BFS拡張
-  const queue=[...seeds.map(([r,c],i)=>({r,c,color:i}))];
+  const queue=seeds.map(([r,c],i)=>({r,c,color:i}));
   shuffleArr(queue);
   while(queue.length){
     const idx=rnd(queue.length);
-    const {r,c,color}=queue[idx];
-    queue.splice(idx,1);
+    const {r,c,color}=queue[idx];queue.splice(idx,1);
     for(const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]){
       const nr=r+dr,nc=c+dc;
       if(nr<0||nr>=N||nc<0||nc>=N||grid[nr][nc]!==-1)continue;
-      grid[nr][nc]=color;
-      queue.push({r:nr,c:nc,color});
+      grid[nr][nc]=color;queue.push({r:nr,c:nc,color});
     }
   }
-
-  // 全セルが埋まっているか確認
   if(grid.some(row=>row.some(v=>v===-1)))return null;
-  // 各エリアが連結かつ最低1セル以上
   for(let i=0;i<N;i++){
-    const cells=[];
-    for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(grid[r][c]===i)cells.push([r,c]);
-    if(cells.length===0)return null;
+    if(!grid.some(row=>row.some(v=>v===i)))return null;
   }
   return grid;
 }
 
 // ============================================================
-// ソルバー（バックトラック）
-// 制約: 各エリアに1匹、各行1匹、各列1匹、隣接なし
+// ソルバー（全解列挙）
 // ============================================================
-function solve(N,regions){
-  // エリアごとのセル一覧
+function solveAll(N,regions,maxSolutions=2){
   const areaCells=Array.from({length:N},()=>[]);
   for(let r=0;r<N;r++)for(let c=0;c<N;c++)areaCells[regions[r][c]].push([r,c]);
 
   const usedRows=new Set(),usedCols=new Set();
   const placed=[];
+  const solutions=[];
 
   function bt(areaIdx){
-    if(areaIdx===N)return true;
+    if(solutions.length>=maxSolutions)return;
+    if(areaIdx===N){solutions.push([...placed]);return;}
     for(const [r,c] of areaCells[areaIdx]){
       if(usedRows.has(r)||usedCols.has(c))continue;
-      // 隣接チェック
       let adj=false;
       for(const [pr,pc] of placed){
         if(Math.abs(pr-r)<=1&&Math.abs(pc-c)<=1){adj=true;break;}
       }
       if(adj)continue;
       usedRows.add(r);usedCols.add(c);placed.push([r,c]);
-      if(bt(areaIdx+1))return true;
+      bt(areaIdx+1);
       usedRows.delete(r);usedCols.delete(c);placed.pop();
+      if(solutions.length>=maxSolutions)return;
     }
-    return false;
   }
-
-  return bt(0)?[...placed]:null;
+  bt(0);
+  return solutions;
 }
 
 // ============================================================
-// ゲーム状態
+// レベル生成（唯一解保証）
 // ============================================================
-let currentLevel=0;
-let N,regions,solution,cellStates,lives,gameOver;
-let pressTimer=null;
+function generateLevel(N){
+  for(let attempt=0;attempt<200;attempt++){
+    const regions=makeRegions(N);
+    if(!regions)continue;
+    const sols=solveAll(N,regions,2);
+    if(sols.length===1){
+      return{N,regions,solution:sols[0]};
+    }
+  }
+  return null;
+}
 
-const LEVELS=[4,5,6,7,8,9,10]; // グリッドサイズ
+// ============================================================
+// UI
+// ============================================================
+function buildLevelSelect(){
+  const sel=document.getElementById('level-select');
+  sel.innerHTML='';
+  LEVELS.forEach((size,i)=>{
+    const btn=document.createElement('button');
+    btn.className='lbtn'+(i===currentLevel?' active':'');
+    btn.innerHTML=`Lv${i+1}<br><span style="font-size:10px;">${size}×${size}</span>`;
+    btn.onclick=()=>startLevel(i);
+    sel.appendChild(btn);
+  });
+}
 
-function rnd(n){return Math.floor(Math.random()*n);}
-function shuffleArr(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}}
+function showLevelSelect(){
+  hideOverlay('overlay-clear');hideOverlay('overlay-over');
+  hideOverlay('overlay-giveup');
+  buildLevelSelect();
+  document.getElementById('overlay-select').classList.add('show');
+}
+
+function hideOverlay(id){document.getElementById(id).classList.remove('show');}
 
 function startLevel(lvIdx){
+  hideOverlay('overlay-select');hideOverlay('overlay-clear');
+  hideOverlay('overlay-over');hideOverlay('overlay-giveup');
   currentLevel=lvIdx;
-  lives=3;gameOver=false;
+  lives=3;gameOver=false;hintUsed=0;
   updateLives();
   document.getElementById('level-label').textContent=`LEVEL ${lvIdx+1}`;
-  hideOverlay('overlay-clear');hideOverlay('overlay-over');hideOverlay('overlay-select');
+  document.getElementById('grid-wrap').style.display='block';
 
   const size=LEVELS[Math.min(lvIdx,LEVELS.length-1)];
-  let lv=null;
-  for(let i=0;i<50;i++){lv=generateLevel(size);if(lv)break;}
-  if(!lv){alert('生成失敗、再試行してください');return;}
 
-  N=lv.N;regions=lv.regions;solution=lv.solution;
-  cellStates=Array.from({length:N},()=>Array(N).fill(0)); // 0=空,1=足跡,2=猫
+  // ローディング表示
+  document.getElementById('grid').innerHTML='<div style="color:#aaa;padding:20px;font-size:13px;">生成中...</div>';
 
-  buildGrid();
-  updateProgress();
+  setTimeout(()=>{
+    let lv=null;
+    for(let i=0;i<100;i++){lv=generateLevel(size);if(lv)break;}
+    if(!lv){
+      document.getElementById('grid').innerHTML='<div style="color:#e05050;padding:20px;">生成失敗。再試行してください。</div>';
+      return;
+    }
+    N=lv.N;regions=lv.regions;solution=lv.solution;
+    cellStates=Array.from({length:N},()=>Array(N).fill(0));
+    buildGrid();
+    updateProgress();
+  },50);
 }
 
 function restartLevel(){startLevel(currentLevel);}
 function nextLevel(){startLevel(Math.min(currentLevel+1,LEVELS.length-1));}
 
+// ============================================================
+// グリッド描画
+// ============================================================
 function buildGrid(){
   const wrap=document.getElementById('grid-wrap');
   const maxSize=Math.min(window.innerWidth-32,440);
-  const cs=Math.floor(maxSize/N)-3;
+  const cs=Math.floor((maxSize-20)/N)-3;
   wrap.style.width=(cs*N+3*(N-1)+20)+'px';
 
   const grid=document.getElementById('grid');
@@ -283,47 +284,31 @@ function buildGrid(){
       cell.className='cell';
       cell.style.width=cs+'px';
       cell.style.background=COLORS[regions[r][c]%COLORS.length];
+      cell.dataset.r=r;cell.dataset.c=c;
 
-      // タッチ（スマホ）とクリック（PC）を分離
-      let isTouching=false;
-      let longPressTimer=null;
-      let longPressed=false;
+      let isTouching=false,longPressed=false,longTimer=null;
 
       cell.addEventListener('touchstart',e=>{
         e.preventDefault();
-        isTouching=true;
-        longPressed=false;
-        longPressTimer=setTimeout(()=>{
-          longPressed=true;
-          handleCat(r,c,cell);
-        },500);
+        isTouching=true;longPressed=false;
+        longTimer=setTimeout(()=>{longPressed=true;handleCat(r,c);},500);
       },{passive:false});
-
       cell.addEventListener('touchend',e=>{
         e.preventDefault();
-        clearTimeout(longPressTimer);
-        if(!longPressed){
-          handlePaw(r,c,cell);
-        }
+        clearTimeout(longTimer);
+        if(!longPressed)handlePaw(r,c);
         longPressed=false;
         setTimeout(()=>{isTouching=false;},300);
       },{passive:false});
-
       cell.addEventListener('touchcancel',()=>{
-        clearTimeout(longPressTimer);
-        isTouching=false;longPressed=false;
+        clearTimeout(longTimer);isTouching=false;longPressed=false;
       });
 
-      // PC用クリック（タッチ後は無視）
       let clickTimer=null;
       cell.addEventListener('click',()=>{
         if(gameOver||isTouching)return;
-        if(clickTimer){
-          clearTimeout(clickTimer);clickTimer=null;
-          handleCat(r,c,cell);
-        } else {
-          clickTimer=setTimeout(()=>{clickTimer=null;handlePaw(r,c,cell);},220);
-        }
+        if(clickTimer){clearTimeout(clickTimer);clickTimer=null;handleCat(r,c);}
+        else{clickTimer=setTimeout(()=>{clickTimer=null;handlePaw(r,c);},220);}
       });
 
       grid.appendChild(cell);
@@ -332,87 +317,117 @@ function buildGrid(){
 }
 
 function getCell(r,c){
-  return document.getElementById('grid').children[r*N+c];
+  return document.getElementById('grid').querySelector(`[data-r="${r}"][data-c="${c}"]`);
 }
 
-function handlePaw(r,c,cell){
-  if(gameOver)return;
+function refreshCell(r,c){
+  const cell=getCell(r,c);
+  if(!cell)return;
   const s=cellStates[r][c];
-  if(s===2)return; // 猫マーク済みは変更しない
-  cellStates[r][c]=s===1?0:1;
-  cell.className='cell'+(cellStates[r][c]===1?' marked-paw':'');
+  cell.className='cell'+(s===1?' marked-paw':s===2?' marked-cat':s===3?' hint-cell':'');
   cell.style.background=COLORS[regions[r][c]%COLORS.length];
 }
 
-function handleCat(r,c,cell){
+// ============================================================
+// 操作
+// ============================================================
+function handlePaw(r,c){
+  if(gameOver)return;
+  const s=cellStates[r][c];
+  if(s===2)return;
+  cellStates[r][c]=s===1?0:s===3?0:1;
+  refreshCell(r,c);
+}
+
+function handleCat(r,c){
   if(gameOver)return;
   if(cellStates[r][c]===2){
-    // 猫を外す
-    cellStates[r][c]=0;
-    cell.className='cell';
-    cell.style.background=COLORS[regions[r][c]%COLORS.length];
-    updateProgress();
-    return;
+    cellStates[r][c]=0;refreshCell(r,c);updateProgress();return;
   }
-  // 猫を置く → 正誤判定
   const isSol=solution.some(([sr,sc])=>sr===r&&sc===c);
   if(isSol){
-    cellStates[r][c]=2;
-    cell.className='cell correct-cat';
-    cell.style.background=COLORS[regions[r][c]%COLORS.length];
-    updateProgress();
-    // クリアチェック
+    cellStates[r][c]=2;refreshCell(r,c);updateProgress();
     const found=solution.filter(([sr,sc])=>cellStates[sr][sc]===2).length;
     if(found===N){
       setTimeout(()=>document.getElementById('overlay-clear').classList.add('show'),400);
     }
   } else {
-    // ミス
-    lives--;
-    updateLives();
+    lives--;updateLives();
+    const cell=getCell(r,c);
     cell.classList.add('wrong');
-    setTimeout(()=>{cell.classList.remove('wrong');},400);
+    setTimeout(()=>{if(cell)cell.classList.remove('wrong');},400);
     if(lives<=0){
       gameOver=true;
-      // 正解を表示
-      solution.forEach(([sr,sc])=>{
-        const sc2=getCell(sr,sc);
-        cellStates[sr][sc]=2;
-        sc2.className='cell correct-cat';
-        sc2.style.background=COLORS[regions[sr][sc]%COLORS.length];
+      showSolution(()=>{
+        setTimeout(()=>document.getElementById('overlay-over').classList.add('show'),500);
       });
-      setTimeout(()=>document.getElementById('overlay-over').classList.add('show'),600);
     }
   }
 }
 
+// 正解を表示してからコールバック（2秒後）
+function showSolution(cb){
+  solution.forEach(([r,c])=>{
+    if(cellStates[r][c]!==2){
+      cellStates[r][c]=2;refreshCell(r,c);
+    }
+  });
+  setTimeout(cb,2000);
+}
+
+// ============================================================
+// ヒント
+// ============================================================
+function useHint(){
+  if(gameOver)return;
+  // 猫がいないセルのうち、まだ足跡もヒントもついていないものを1つ教える
+  const candidates=[];
+  for(let r=0;r<N;r++){
+    for(let c=0;c<N;c++){
+      if(cellStates[r][c]!==0)continue;
+      const isCat=solution.some(([sr,sc])=>sr===r&&sc===c);
+      if(!isCat)candidates.push([r,c]);
+    }
+  }
+  if(candidates.length===0){
+    alert('ヒントがありません！');return;
+  }
+  shuffleArr(candidates);
+  const [r,c]=candidates[0];
+  cellStates[r][c]=3; // ヒントマーク（❌）
+  refreshCell(r,c);
+  hintUsed++;
+}
+
+// ============================================================
+// ギブアップ
+// ============================================================
+function giveUp(){
+  if(gameOver)return;
+  document.getElementById('overlay-giveup').classList.add('show');
+}
+function confirmGiveUp(){
+  hideOverlay('overlay-giveup');
+  gameOver=true;
+  showSolution(()=>{
+    setTimeout(()=>document.getElementById('overlay-over').classList.add('show'),300);
+  });
+}
+
+// ============================================================
+// 表示更新
+// ============================================================
 function updateLives(){
-  const icons=[0,1,2].map(i=>i<(3-lives)?'💀':'🐟').join('');
+  const icons=[0,1,2].map(i=>i<(3-lives)?'🦴':'🐟').join('');
   document.getElementById('lives').textContent=icons;
 }
-
 function updateProgress(){
-  const found=solution.filter(([r,c])=>cellStates[r][c]===2).length;
-  document.getElementById('progress').textContent=`${found} / ${N}`;
+  const found=solution?solution.filter(([r,c])=>cellStates[r][c]===2).length:0;
+  document.getElementById('progress').textContent=`${found} / ${N||0}`;
 }
 
-function showLevelSelect(){
-  hideOverlay('overlay-clear');hideOverlay('overlay-over');
-  const sel=document.getElementById('level-select');
-  sel.innerHTML='';
-  LEVELS.forEach((size,i)=>{
-    const btn=document.createElement('button');
-    btn.className='lbtn'+(i===currentLevel?' active':'');
-    btn.textContent=`Lv${i+1} (${size}×${size})`;
-    btn.onclick=()=>startLevel(i);
-    sel.appendChild(btn);
-  });
-  document.getElementById('overlay-select').classList.add('show');
-}
-
-function hideOverlay(id){document.getElementById(id).classList.remove('show');}
-
-startLevel(0);
+// 初期表示
+buildLevelSelect();
 </script>
 </body>
 </html>
